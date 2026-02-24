@@ -26,21 +26,21 @@ public class JwtService {
     Date expiration = new Date(now.getTime() + properties.expirationMinutes() * 60_000L);
 
     return Jwts.builder()
-        .setSubject(user.getId().toString())
+        .subject(user.getId().toString())
         .claim("email", user.getEmail())
         .claim("role", user.getRole().name())
-        .setIssuedAt(now)
-        .setExpiration(expiration)
-        .signWith(secretKey)
+        .issuedAt(now)
+        .expiration(expiration)
+        .signWith(secretKey, Jwts.SIG.HS256)
         .compact();
   }
 
   public Claims parseToken(String token) {
-    return Jwts.parserBuilder()
-        .setSigningKey(secretKey)
+    return Jwts.parser()
+        .verifyWith(secretKey)
         .build()
-        .parseClaimsJws(token)
-        .getBody();
+        .parseSignedClaims(token)
+        .getPayload();
   }
 
   public UUID getUserId(Claims claims) {
