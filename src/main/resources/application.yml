@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: pulseapi
+  profiles:
+    active: dev
+
+server:
+  port: ${APP_PORT:8080}
+
+app:
+  jwt:
+    secret: ${JWT_SECRET}
+    expiration-minutes: ${JWT_EXP_MINUTES:120}

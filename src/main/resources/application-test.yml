@@ -1,0 +1,21 @@
+spring:
+  task:
+    scheduling:
+      enabled: false
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+app:
+  scheduler:
+    enabled: false
+  jwt:
+    secret: ${JWT_SECRET}
+    expiration-minutes: ${JWT_EXP_MINUTES:60}
