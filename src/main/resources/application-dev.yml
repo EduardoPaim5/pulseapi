@@ -22,5 +22,6 @@ app:
   scheduler:
     claim-batch-size: 50
     claim-lease-seconds: 120
+    max-parallel-checks: 4
   security:
     allow-private-targets: true

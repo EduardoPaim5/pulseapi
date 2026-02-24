@@ -64,6 +64,7 @@ Swagger: `http://localhost:8080/swagger-ui/index.html`
 - `APP_SECURITY_ALLOW_PRIVATE_TARGETS` (prod, default: `false`; mantém bloqueio SSRF para destinos privados)
 - `APP_SCHEDULER_CLAIM_BATCH_SIZE` (prod, default: `50`)
 - `APP_SCHEDULER_CLAIM_LEASE_SECONDS` (prod, default: `120`)
+- `APP_SCHEDULER_MAX_PARALLEL_CHECKS` (prod, default: `4`)
 
 ## Endpoints principais
 - `POST /api/v1/auth/register`

@@ -29,6 +29,7 @@ app:
     enabled: ${APP_SCHEDULER_ENABLED:true}
     claim-batch-size: ${APP_SCHEDULER_CLAIM_BATCH_SIZE:50}
     claim-lease-seconds: ${APP_SCHEDULER_CLAIM_LEASE_SECONDS:120}
+    max-parallel-checks: ${APP_SCHEDULER_MAX_PARALLEL_CHECKS:4}
   security:
     allow-private-targets: ${APP_SECURITY_ALLOW_PRIVATE_TARGETS:false}
 

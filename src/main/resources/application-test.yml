@@ -16,6 +16,7 @@ spring:
 app:
   scheduler:
     enabled: false
+    max-parallel-checks: 2
   security:
     allow-private-targets: true
   jwt:
