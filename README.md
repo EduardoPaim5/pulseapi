@@ -82,7 +82,7 @@ Swagger: `http://localhost:8080/swagger-ui/index.html`
 ```bash
 curl -X POST https://pulseapi-production-c537.up.railway.app/api/v1/auth/register \
  -H "Content-Type: application/json" \
- -d '{"name":"test","email":"test@test.com","password":"123456"}'
+ -d '{"email":"test@test.com","password":"123456"}'
 ```
 
 ### 2. Login
@@ -99,7 +99,7 @@ Copy the token returned.
 curl -X POST https://pulseapi-production-c537.up.railway.app/api/v1/monitors \
  -H "Authorization: Bearer TOKEN_AQUI" \
  -H "Content-Type: application/json" \
- -d '{"name":"Google","url":"https://google.com","method":"GET","intervalSeconds":60}'
+ -d '{"name":"Google","url":"https://google.com","intervalSec":60,"timeoutMs":5000,"enabled":true}'
 ```
 
 ## Rodar testes

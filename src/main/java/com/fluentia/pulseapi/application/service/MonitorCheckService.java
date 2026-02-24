@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,18 +38,18 @@ public class MonitorCheckService {
   private final CheckRunRepository checkRunRepository;
   private final IncidentRepository incidentRepository;
   private final AlertRepository alertRepository;
-  private final RestTemplate restTemplate;
+  private final RestTemplateBuilder restTemplateBuilder;
 
   public MonitorCheckService(MonitorRepository monitorRepository,
       CheckRunRepository checkRunRepository,
       IncidentRepository incidentRepository,
       AlertRepository alertRepository,
-      RestTemplate restTemplate) {
+      RestTemplateBuilder restTemplateBuilder) {
     this.monitorRepository = monitorRepository;
     this.checkRunRepository = checkRunRepository;
     this.incidentRepository = incidentRepository;
     this.alertRepository = alertRepository;
-    this.restTemplate = restTemplate;
+    this.restTemplateBuilder = restTemplateBuilder;
   }
 
   @Transactional
@@ -69,6 +70,7 @@ public class MonitorCheckService {
     Integer latencyMs = null;
     String errorMessage = null;
     boolean success = false;
+    RestTemplate restTemplate = buildRestTemplate(monitor);
 
     try {
       ResponseEntity<String> response = restTemplate.getForEntity(monitor.getUrl(), String.class);
@@ -106,6 +108,15 @@ public class MonitorCheckService {
 
   private Integer toMs(long nanos) {
     return (int) Duration.ofNanos(nanos).toMillis();
+  }
+
+  private RestTemplate buildRestTemplate(Monitor monitor) {
+    int timeoutMs = monitor.getTimeoutMs() == null ? 5000 : Math.max(250, monitor.getTimeoutMs());
+    Duration timeout = Duration.ofMillis(timeoutMs);
+    return restTemplateBuilder
+        .setConnectTimeout(timeout)
+        .setReadTimeout(timeout)
+        .build();
   }
 
   private void updateConsecutiveCounters(Monitor monitor, boolean success) {
