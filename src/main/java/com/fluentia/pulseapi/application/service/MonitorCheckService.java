@@ -22,6 +22,7 @@ import com.fluentia.pulseapi.domain.repository.AlertRepository;
 import com.fluentia.pulseapi.domain.repository.CheckRunRepository;
 import com.fluentia.pulseapi.domain.repository.IncidentRepository;
 import com.fluentia.pulseapi.domain.repository.MonitorRepository;
+import com.fluentia.pulseapi.infrastructure.security.MonitorTargetUrlValidator;
 
 @Service
 public class MonitorCheckService {
@@ -39,17 +40,20 @@ public class MonitorCheckService {
   private final IncidentRepository incidentRepository;
   private final AlertRepository alertRepository;
   private final RestTemplateBuilder restTemplateBuilder;
+  private final MonitorTargetUrlValidator targetUrlValidator;
 
   public MonitorCheckService(MonitorRepository monitorRepository,
       CheckRunRepository checkRunRepository,
       IncidentRepository incidentRepository,
       AlertRepository alertRepository,
-      RestTemplateBuilder restTemplateBuilder) {
+      RestTemplateBuilder restTemplateBuilder,
+      MonitorTargetUrlValidator targetUrlValidator) {
     this.monitorRepository = monitorRepository;
     this.checkRunRepository = checkRunRepository;
     this.incidentRepository = incidentRepository;
     this.alertRepository = alertRepository;
     this.restTemplateBuilder = restTemplateBuilder;
+    this.targetUrlValidator = targetUrlValidator;
   }
 
   @Transactional
@@ -73,10 +77,15 @@ public class MonitorCheckService {
     RestTemplate restTemplate = buildRestTemplate(monitor);
 
     try {
+      targetUrlValidator.assertAllowedForExecution(monitor.getUrl());
       ResponseEntity<String> response = restTemplate.getForEntity(monitor.getUrl(), String.class);
       statusCode = response.getStatusCode().value();
       latencyMs = toMs(System.nanoTime() - startNanos);
       success = response.getStatusCode().is2xxSuccessful();
+    } catch (IllegalArgumentException ex) {
+      latencyMs = toMs(System.nanoTime() - startNanos);
+      errorMessage = ex.getMessage();
+      logger.warn("Monitor {} bloqueado por validação de segurança: {}", monitor.getId(), ex.getMessage());
     } catch (ResourceAccessException ex) {
       latencyMs = toMs(System.nanoTime() - startNanos);
       errorMessage = "Timeout ou erro de conexão";

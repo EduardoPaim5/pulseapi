@@ -57,15 +57,22 @@ Swagger: `http://localhost:8080/swagger-ui/index.html`
 - `DB_PASSWORD` (default: `pulseapi`)
 - `JWT_SECRET` (min. 32 chars, obrigatório)
 - `JWT_EXP_MINUTES` (default: `120`)
+- `JWT_REFRESH_EXP_DAYS` (default: `7`)
 - `APP_PORT` (default: `8080`)
 - `DB_URL` (prod)
 - `PORT` (prod, default: `8080`)
 - `CORS_ALLOWED_ORIGINS` (prod, lista separada por vírgula, obrigatório para deploy)
+- `APP_SECURITY_ALLOW_PRIVATE_TARGETS` (prod, default: `false`; mantém bloqueio SSRF para destinos privados)
+- `APP_SCHEDULER_CLAIM_BATCH_SIZE` (prod, default: `50`)
+- `APP_SCHEDULER_CLAIM_LEASE_SECONDS` (prod, default: `120`)
+- `APP_SCHEDULER_MAX_PARALLEL_CHECKS` (prod, default: `4`)
 
 ## Endpoints principais
 - `POST /api/v1/auth/register`
 - `POST /api/v1/auth/login`
 - `GET /api/v1/auth/me`
+- `POST /api/v1/auth/refresh`
+- `POST /api/v1/auth/logout`
 - `GET /api/v1/monitors`
 - `POST /api/v1/monitors`
 - `GET /api/v1/monitors/{id}`
@@ -75,6 +82,24 @@ Swagger: `http://localhost:8080/swagger-ui/index.html`
 - `POST /api/v1/monitors/{id}/recheck`
 - `GET /api/v1/monitors/{id}/checks/summary?window=24h|7d|30d`
 - `GET /api/v1/dashboard/overview?window=7d`
+
+## Postman
+- Collection: `postman/PulseAPI.postman_collection.json`
+- Environment local: `postman/PulseAPI.local.postman_environment.json`
+
+### Como usar em 2 minutos
+1. Importe os dois arquivos no Postman.
+2. Selecione o environment `PulseAPI Local`.
+3. Ajuste `baseUrl` para local ou Railway.
+4. Execute em ordem:
+   - `Auth > Register` (ou `Auth > Login` se o email já existir)
+   - `Auth > Login`
+   - `Monitors > Create Monitor`
+   - requests restantes conforme necessário
+
+Notas:
+- A collection preenche `accessToken`, `monitorId` e `alertId` automaticamente quando possível.
+- Não há segredos hardcoded; ajuste apenas variáveis do environment.
 
 ## Quick test (1 minute demo)
 
@@ -110,6 +135,7 @@ Observação: os testes de integração usam Testcontainers e requerem Docker di
 Se o Docker estiver instalado, mas os testes falharem por versão de API, confira `src/test/resources/testcontainers.properties`.
 
 Nota: o `p95LatencyMs` é aproximado via ordenação no banco e offset do percentil (trade-off de precisão vs. performance).
+Nota: o fluxo de sessão usa access token no response e refresh token em cookie HttpOnly.
 
 ## Deploy (Railway)
 1. Crie um novo projeto e conecte este repositório.

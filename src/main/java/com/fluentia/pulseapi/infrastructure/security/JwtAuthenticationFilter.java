@@ -33,6 +33,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     if (token != null) {
       try {
         Claims claims = jwtService.parseToken(token);
+        if (!jwtService.isAccessToken(claims)) {
+          SecurityContextHolder.clearContext();
+          filterChain.doFilter(request, response);
+          return;
+        }
         userRepository.findById(jwtService.getUserId(claims))
             .ifPresent(user -> {
               UserPrincipal principal = new UserPrincipal(user);

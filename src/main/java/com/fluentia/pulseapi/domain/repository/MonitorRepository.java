@@ -16,6 +16,26 @@ public interface MonitorRepository extends JpaRepository<Monitor, UUID> {
   @Query("SELECT m FROM Monitor m WHERE m.enabled = true AND (m.nextCheckAt IS NULL OR m.nextCheckAt <= :now)")
   List<Monitor> findEligible(@Param("now") OffsetDateTime now);
 
+  @Query(value = """
+      WITH picked AS (
+        SELECT id
+        FROM monitors
+        WHERE enabled = true
+          AND (next_check_at IS NULL OR next_check_at <= :now)
+        ORDER BY next_check_at NULLS FIRST
+        FOR UPDATE SKIP LOCKED
+        LIMIT :batchSize
+      )
+      UPDATE monitors m
+      SET next_check_at = :leaseUntil
+      FROM picked
+      WHERE m.id = picked.id
+      RETURNING m.*
+      """, nativeQuery = true)
+  List<Monitor> claimEligibleForCheck(@Param("now") OffsetDateTime now,
+      @Param("leaseUntil") OffsetDateTime leaseUntil,
+      @Param("batchSize") int batchSize);
+
   long countByOwnerId(UUID ownerId);
 
   long countByOwnerIdAndLastStatus(UUID ownerId, String lastStatus);
