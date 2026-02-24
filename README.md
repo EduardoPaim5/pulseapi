@@ -62,6 +62,8 @@ Swagger: `http://localhost:8080/swagger-ui/index.html`
 - `PORT` (prod, default: `8080`)
 - `CORS_ALLOWED_ORIGINS` (prod, lista separada por vírgula, obrigatório para deploy)
 - `APP_SECURITY_ALLOW_PRIVATE_TARGETS` (prod, default: `false`; mantém bloqueio SSRF para destinos privados)
+- `APP_SCHEDULER_CLAIM_BATCH_SIZE` (prod, default: `50`)
+- `APP_SCHEDULER_CLAIM_LEASE_SECONDS` (prod, default: `120`)
 
 ## Endpoints principais
 - `POST /api/v1/auth/register`
