@@ -37,6 +37,10 @@ public class MonitorDtos {
       Integer intervalSec,
       Integer timeoutMs,
       Boolean enabled,
+      String lastStatus,
+      Integer lastLatencyMs,
+      OffsetDateTime lastCheckedAt,
+      OffsetDateTime nextCheckAt,
       OffsetDateTime createdAt,
       OffsetDateTime updatedAt
   ) {}
