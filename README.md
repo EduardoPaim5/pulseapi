@@ -76,6 +76,24 @@ Swagger: `http://localhost:8080/swagger-ui/index.html`
 - `GET /api/v1/monitors/{id}/checks/summary?window=24h|7d|30d`
 - `GET /api/v1/dashboard/overview?window=7d`
 
+## Postman
+- Collection: `postman/PulseAPI.postman_collection.json`
+- Environment local: `postman/PulseAPI.local.postman_environment.json`
+
+### Como usar em 2 minutos
+1. Importe os dois arquivos no Postman.
+2. Selecione o environment `PulseAPI Local`.
+3. Ajuste `baseUrl` para local ou Railway.
+4. Execute em ordem:
+   - `Auth > Register` (ou `Auth > Login` se o email já existir)
+   - `Auth > Login`
+   - `Monitors > Create Monitor`
+   - requests restantes conforme necessário
+
+Notas:
+- A collection preenche `accessToken`, `monitorId` e `alertId` automaticamente quando possível.
+- Não há segredos hardcoded; ajuste apenas variáveis do environment.
+
 ## Quick test (1 minute demo)
 
 ### 1. Register user
