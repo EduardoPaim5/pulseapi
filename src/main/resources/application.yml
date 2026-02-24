@@ -1,8 +1,6 @@
 spring:
   application:
     name: pulseapi
-  profiles:
-    active: dev
 
 server:
   port: ${APP_PORT:8080}
