@@ -25,13 +25,27 @@ import com.fluentia.pulseapi.infrastructure.security.JwtAuthenticationFilter;
 public class SecurityConfig {
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtFilter,
+      Environment environment,
       CorsConfigurationSource corsConfigurationSource) throws Exception {
+    String[] publicEndpoints = isDevProfile(environment)
+        ? new String[] {
+            "/api/v1/auth/**",
+            "/actuator/health",
+            "/v3/api-docs/**",
+            "/swagger-ui/**",
+            "/swagger-ui.html"
+        }
+        : new String[] {
+            "/api/v1/auth/**",
+            "/actuator/health"
+        };
+
     http
         .csrf(csrf -> csrf.disable())
         .cors(cors -> cors.configurationSource(corsConfigurationSource))
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/api/v1/auth/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/actuator/health").permitAll()
+            .requestMatchers(publicEndpoints).permitAll()
             .anyRequest().authenticated()
         )
         .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
@@ -73,5 +87,9 @@ public class SecurityConfig {
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     source.registerCorsConfiguration("/**", configuration);
     return source;
+  }
+
+  private boolean isDevProfile(Environment environment) {
+    return Arrays.asList(environment.getActiveProfiles()).contains("dev");
   }
 }
