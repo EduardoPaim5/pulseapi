@@ -16,6 +16,8 @@ spring:
 app:
   scheduler:
     enabled: false
+  security:
+    allow-private-targets: true
   jwt:
     secret: ${JWT_SECRET}
     expiration-minutes: ${JWT_EXP_MINUTES:60}

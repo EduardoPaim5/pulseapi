@@ -27,6 +27,8 @@ logging:
 app:
   scheduler:
     enabled: ${APP_SCHEDULER_ENABLED:true}
+  security:
+    allow-private-targets: ${APP_SECURITY_ALLOW_PRIVATE_TARGETS:false}
 
 management:
   endpoints:

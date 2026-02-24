@@ -13,13 +13,16 @@ import com.fluentia.pulseapi.domain.entity.Monitor;
 import com.fluentia.pulseapi.domain.entity.User;
 import com.fluentia.pulseapi.domain.repository.MonitorRepository;
 import com.fluentia.pulseapi.infrastructure.exception.ApiException;
+import com.fluentia.pulseapi.infrastructure.security.MonitorTargetUrlValidator;
 
 @Service
 public class MonitorService {
   private final MonitorRepository monitorRepository;
+  private final MonitorTargetUrlValidator targetUrlValidator;
 
-  public MonitorService(MonitorRepository monitorRepository) {
+  public MonitorService(MonitorRepository monitorRepository, MonitorTargetUrlValidator targetUrlValidator) {
     this.monitorRepository = monitorRepository;
+    this.targetUrlValidator = targetUrlValidator;
   }
 
   public List<MonitorResponse> listByOwner(User owner) {
@@ -42,6 +45,7 @@ public class MonitorService {
 
   @Transactional
   public MonitorResponse create(User owner, CreateMonitorRequest request) {
+    validateMonitorUrl(request.url());
     Monitor monitor = new Monitor(UUID.randomUUID(), owner, request.name(), request.url(),
         request.intervalSec(), request.timeoutMs(), request.enabled() != null ? request.enabled() : Boolean.TRUE);
     if (Boolean.TRUE.equals(monitor.getEnabled())) {
@@ -60,6 +64,7 @@ public class MonitorService {
       monitor.setName(request.name());
     }
     if (request.url() != null) {
+      validateMonitorUrl(request.url());
       monitor.setUrl(request.url());
     }
     if (request.intervalSec() != null) {
@@ -111,5 +116,13 @@ public class MonitorService {
         monitor.getCreatedAt(),
         monitor.getUpdatedAt()
     );
+  }
+
+  private void validateMonitorUrl(String url) {
+    try {
+      targetUrlValidator.assertAllowedForMonitorConfig(url);
+    } catch (IllegalArgumentException ex) {
+      throw ApiException.badRequest(ex.getMessage());
+    }
   }
 }

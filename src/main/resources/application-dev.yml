@@ -17,3 +17,7 @@ spring:
 logging:
   level:
     org.hibernate.SQL: INFO
+
+app:
+  security:
+    allow-private-targets: true
