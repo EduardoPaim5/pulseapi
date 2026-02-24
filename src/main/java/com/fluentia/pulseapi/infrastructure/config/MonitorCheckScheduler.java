@@ -28,6 +28,9 @@ public class MonitorCheckScheduler {
   public void runScheduler() {
     try {
       List<Monitor> eligible = monitorRepository.findEligible(OffsetDateTime.now());
+      if (!eligible.isEmpty()) {
+        logger.info("Scheduler encontrou {} monitores elegiveis para check", eligible.size());
+      }
       for (Monitor monitor : eligible) {
         try {
           monitorCheckService.runCheck(monitor);

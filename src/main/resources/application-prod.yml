@@ -22,6 +22,11 @@ logging:
     root: INFO
     org.springframework: INFO
     org.hibernate.SQL: WARN
+    com.fluentia.pulseapi.infrastructure.config.MonitorCheckScheduler: INFO
+
+app:
+  scheduler:
+    enabled: ${APP_SCHEDULER_ENABLED:true}
 
 management:
   endpoints:
