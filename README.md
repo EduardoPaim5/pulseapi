@@ -57,6 +57,7 @@ Swagger: `http://localhost:8080/swagger-ui/index.html`
 - `DB_PASSWORD` (default: `pulseapi`)
 - `JWT_SECRET` (min. 32 chars, obrigatório)
 - `JWT_EXP_MINUTES` (default: `120`)
+- `JWT_REFRESH_EXP_DAYS` (default: `7`)
 - `APP_PORT` (default: `8080`)
 - `DB_URL` (prod)
 - `PORT` (prod, default: `8080`)
@@ -70,6 +71,8 @@ Swagger: `http://localhost:8080/swagger-ui/index.html`
 - `POST /api/v1/auth/register`
 - `POST /api/v1/auth/login`
 - `GET /api/v1/auth/me`
+- `POST /api/v1/auth/refresh`
+- `POST /api/v1/auth/logout`
 - `GET /api/v1/monitors`
 - `POST /api/v1/monitors`
 - `GET /api/v1/monitors/{id}`
@@ -132,6 +135,7 @@ Observação: os testes de integração usam Testcontainers e requerem Docker di
 Se o Docker estiver instalado, mas os testes falharem por versão de API, confira `src/test/resources/testcontainers.properties`.
 
 Nota: o `p95LatencyMs` é aproximado via ordenação no banco e offset do percentil (trade-off de precisão vs. performance).
+Nota: o fluxo de sessão usa access token no response e refresh token em cookie HttpOnly.
 
 ## Deploy (Railway)
 1. Crie um novo projeto e conecte este repositório.

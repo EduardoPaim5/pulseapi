@@ -22,3 +22,4 @@ app:
   jwt:
     secret: ${JWT_SECRET}
     expiration-minutes: ${JWT_EXP_MINUTES:60}
+    refresh-expiration-days: ${JWT_REFRESH_EXP_DAYS:7}

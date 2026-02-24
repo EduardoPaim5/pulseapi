@@ -12,6 +12,8 @@ import com.fluentia.pulseapi.domain.entity.UserRole;
 import com.fluentia.pulseapi.domain.repository.UserRepository;
 import com.fluentia.pulseapi.infrastructure.exception.ApiException;
 import com.fluentia.pulseapi.infrastructure.security.JwtService;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 
 @Service
 public class AuthService {
@@ -26,7 +28,7 @@ public class AuthService {
   }
 
   @Transactional
-  public AuthResponse register(RegisterRequest request) {
+  public TokenPair register(RegisterRequest request) {
     if (userRepository.existsByEmail(request.email())) {
       throw ApiException.badRequest("E-mail já cadastrado");
     }
@@ -35,11 +37,10 @@ public class AuthService {
         passwordEncoder.encode(request.password()), UserRole.USER);
     userRepository.save(user);
 
-    String token = jwtService.generateToken(user);
-    return new AuthResponse(token, "Bearer");
+    return issueTokenPair(user);
   }
 
-  public AuthResponse login(LoginRequest request) {
+  public TokenPair login(LoginRequest request) {
     User user = userRepository.findByEmail(request.email().toLowerCase())
         .orElseThrow(() -> ApiException.unauthorized("Credenciais inválidas"));
 
@@ -47,7 +48,31 @@ public class AuthService {
       throw ApiException.unauthorized("Credenciais inválidas");
     }
 
-    String token = jwtService.generateToken(user);
-    return new AuthResponse(token, "Bearer");
+    return issueTokenPair(user);
   }
+
+  public AuthResponse refreshAccessToken(String refreshToken) {
+    if (refreshToken == null || refreshToken.isBlank()) {
+      throw ApiException.unauthorized("Refresh token ausente");
+    }
+    try {
+      Claims claims = jwtService.parseToken(refreshToken);
+      if (!jwtService.isRefreshToken(claims)) {
+        throw ApiException.unauthorized("Refresh token inválido");
+      }
+      User user = userRepository.findById(jwtService.getUserId(claims))
+          .orElseThrow(() -> ApiException.unauthorized("Usuário inválido"));
+      return new AuthResponse(jwtService.generateAccessToken(user), "Bearer");
+    } catch (JwtException ex) {
+      throw ApiException.unauthorized("Refresh token inválido");
+    }
+  }
+
+  private TokenPair issueTokenPair(User user) {
+    String accessToken = jwtService.generateAccessToken(user);
+    String refreshToken = jwtService.generateRefreshToken(user);
+    return new TokenPair(new AuthResponse(accessToken, "Bearer"), refreshToken);
+  }
+
+  public record TokenPair(AuthResponse authResponse, String refreshToken) {}
 }
