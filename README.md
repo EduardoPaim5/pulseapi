@@ -76,6 +76,32 @@ Swagger: `http://localhost:8080/swagger-ui/index.html`
 - `GET /api/v1/monitors/{id}/checks/summary?window=24h|7d|30d`
 - `GET /api/v1/dashboard/overview?window=7d`
 
+## Quick test (1 minute demo)
+
+### 1. Register user
+```bash
+curl -X POST https://pulseapi-production-c537.up.railway.app/api/v1/auth/register \
+ -H "Content-Type: application/json" \
+ -d '{"name":"test","email":"test@test.com","password":"123456"}'
+```
+
+### 2. Login
+```bash
+curl -X POST https://pulseapi-production-c537.up.railway.app/api/v1/auth/login \
+ -H "Content-Type: application/json" \
+ -d '{"email":"test@test.com","password":"123456"}'
+```
+
+Copy the token returned.
+
+### 3. Create monitor
+```bash
+curl -X POST https://pulseapi-production-c537.up.railway.app/api/v1/monitors \
+ -H "Authorization: Bearer TOKEN_AQUI" \
+ -H "Content-Type: application/json" \
+ -d '{"name":"Google","url":"https://google.com","method":"GET","intervalSeconds":60}'
+```
+
 ## Rodar testes
 ```bash
 ./mvnw test

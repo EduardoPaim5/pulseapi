@@ -104,6 +104,10 @@ public class MonitorService {
         monitor.getIntervalSec(),
         monitor.getTimeoutMs(),
         monitor.getEnabled(),
+        monitor.getLastStatus(),
+        monitor.getLastLatencyMs(),
+        monitor.getLastCheckedAt(),
+        monitor.getNextCheckAt(),
         monitor.getCreatedAt(),
         monitor.getUpdatedAt()
     );
