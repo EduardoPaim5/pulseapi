@@ -99,6 +99,7 @@ public class MonitorCheckService {
 
     updateConsecutiveCounters(monitor, success);
     handleIncidentsAndAlerts(monitor, startedAt);
+    monitorRepository.save(monitor);
 
     return new RecheckResponse(success, statusCode, latencyMs, errorMessage, startedAt);
   }
